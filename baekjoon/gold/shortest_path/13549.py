@@ -5,8 +5,9 @@ readline = lambda : sys.stdin.readline().strip()
 
 N, K, = map(int, readline().split())
 
-def addtoqueue(new_pos: int, new_cost: int) -> None:
+def addtoqueue(new_pos: int, cost: int, cost_diff: int) -> None:
     global costs, queue, ans
+    new_cost = cost + cost_diff
     if new_pos < 0:
         return
     if new_cost >= ans:
@@ -14,7 +15,10 @@ def addtoqueue(new_pos: int, new_cost: int) -> None:
     if new_pos in costs and costs[new_pos] <= new_cost:
         return
     costs[new_pos] = new_cost
-    queue.append((new_pos, new_cost))
+    if cost_diff == 1:
+        queue.append((new_pos, new_cost))
+    else:
+        queue.appendleft((new_pos, new_cost))
 
 costs = dict(N = 0)
 ans = INF
@@ -27,15 +31,13 @@ while queue:
     if pos in costs and costs[pos] < cost:
         continue
     if pos > K:
-        new_pos, new_cost = pos - 1, cost + 1
-        addtoqueue(new_pos, new_cost)
+        addtoqueue(pos - 1, cost, 1)
         continue
     for new_pos, new_cost in (
-        (pos - 1, cost + 1),
-        (pos + 1, cost + 1),
-        (pos * 2, cost)
+        (pos - 1, 1),
+        (pos + 1, 1),
+        (pos * 2, 0)
         ):
-        addtoqueue(new_pos, new_cost)
-
+        addtoqueue(new_pos, cost, new_cost)
 
 print(ans)
